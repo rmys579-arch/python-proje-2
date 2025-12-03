@@ -1,3 +1,4 @@
+# bu dosya ile çekeceiğimiz verinin yapısını tanımlıyoruz.
 import scrapy #web sitesinden istenilen veriyi çekebilmek için bu kütüphaneyi içeri aktarıyoruz.
 
 class JobAdItem(scrapy.Item):
