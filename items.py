@@ -1,4 +1,5 @@
 # bu dosya ile çekeceiğimiz verinin yapısını tanımlıyoruz.
+# site kariyer.net olacak aranan pyhton developer için ilan başlığı, şirket adı, kısa açıklama ve ilan linki bilgilerini çekeceğiz.
 import scrapy #web sitesinden istenilen veriyi çekebilmek için bu kütüphaneyi içeri aktarıyoruz.
 
 class JobAdItem(scrapy.Item):
