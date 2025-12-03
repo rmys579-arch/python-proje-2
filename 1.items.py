@@ -11,7 +11,7 @@ class JobAdItem(scrapy.Item):
     job_title = scrapy.Field()          # İş ilanının başlığını tutacak.
     company_name = scrapy.Field()       # İlanı yayınlayan şirketin adını tutacak.
     summary_description = scrapy.Field()# İş açıklamasının kısa özetini tutacak.
-    ad_link = scrapy.Field()            # Tekrarlayan ilanları kontrol etmek için benzersiz link.#  1. Proje Kurulum Değişkenleri 
+    ad_link = scrapy.Field()            # Tekrarlayan ilanları kontrol etmek için link.#  1. Proje Kurulum Değişkenleri 
 # Arama anahtar kelimesini buraya ayarlıyorum. Başlangıç için Python Developer seçtik.
 SEARCH_KEYWORD = "Python-Developer" 
 
