@@ -1,5 +1,5 @@
 
-
+import scrapy
 # Scrapy, veri yapısını ayrı bir dosyada istediği için
 # 'items.py' dosyasında tanımladığım Item sınıfını içe aktarıyorum.
 from .items import JobAdItem 
