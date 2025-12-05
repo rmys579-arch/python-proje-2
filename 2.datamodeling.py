@@ -2,7 +2,7 @@
 import scrapy
 # Scrapy, veri yapısını ayrı bir dosyada istediği için
 # 'items.py' dosyasında tanımladığım Item sınıfını içe aktarıyorum.
-from .items import JobAdItem 
+from items import JobAdItem 
 
 class KariyerSpider(scrapy.Spider):
     # Bu botumun adı. Botu çalıştırmak için bu adı kullanacağım.
