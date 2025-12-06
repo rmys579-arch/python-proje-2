@@ -4,6 +4,8 @@ import scrapy
 # 'items.py' dosyasında tanımladığım Item sınıfını içe aktarıyorum.
 from items import JobAdItem 
 
+START_URL = 'https://www.kariyer.net/is-ilanlari'
+
 class KariyerSpider(scrapy.Spider):
     # Bu botumun adı. Botu çalıştırmak için bu adı kullanacağım.
     name = 'my_first_kariyer_scraper'
