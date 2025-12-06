@@ -1,62 +1,44 @@
-İş İlanı ve Yetenek Analiz Botu
-Bu proje, iş arama sitesi olan kariyer.net'ten ilanları otomatik olarak tarayan, verileri temizleyip veritabanında saklayan ve sektörde en çok aranan yetkinlikleri (Python, SQL, İletişim vb.) analiz ederek görselleştiren bir veri mühendisliği projesidir.
+Job Posting and Talent Analysis Bot This project is a data engineering project that automatically scans ads from the job search site kariyer.net, cleans the data and stores it in the database and analyzes and visualizes the most sought-after competencies in the sector (Python, SQL, Communication, etc.).
+🚀 About the Project It can be difficult to understand which talents are more valuable in the technology world. Thanks to this project, instead of reading hundreds of ads manually;
+We automatically collect lans (Data Scraping).
 
-🚀 Proje Hakkında
-Teknoloji dünyasında hangi yeteneklerin daha değerli olduğunu anlamak zor olabilir. Bu proje sayesinde manuel olarak yüzlerce ilanı okumak yerine;
+We clean and configure the data (Data Cleaning).
 
-İlanları otomatik topluyoruz (Data Scraping).
+We prove with data which hard skills and soft skills are more popular (Data Analysis).
+✨ Key Features Automatic Data Acquisition: Pulls data from dynamic websites with Selenium.
 
-Verileri temizleyip yapılandırıyoruz (Data Cleaning).
+Smart Database Management: Blocks Duplicate ads with link control, only saves new ads.
 
-Hangi teknik (Hard Skills) ve sosyal (Soft Skills) yeteneklerin daha popüler olduğunu veriyle kanıtlıyoruz (Data Analysis).
+Advanced Data Cleaning: Cleans up HTML tags, unnecessary spaces, and broken characters.
 
-✨ Temel Özellikler
-Otomatik Veri Toplama: Selenium ile dinamik web sitelerinden veri çeker.
+Category Talent Analysis: Counts the talents we determine in the advertisement texts separately.
 
-Akıllı Veritabanı Yönetimi: Duplicate ilanları link kontrolü ile engeller, sadece yeni ilanları kaydeder.
+Visual Reporting: Pours results into understandable charts using Matplotlib
 
-Gelişmiş Veri Temizliği: HTML etiketlerini, gereksiz boşlukları ve bozuk karakterleri temizler.
+🛠️ Installation and Running To run the project on your computer, follow the steps below:
 
-Kategorili Yetenek Analizi: İlan metinleri içinde belirlediğimiz yetenekleri  ayrı ayrı sayar.
+1.Download the Project:
 
-Görsel Raporlama: Sonuçları Matplotlib kullanarak anlaşılır grafiklere döker.
+Git clone https://github.com/kullaniciadi/is-ilani-analizi.git cd is-ilani-analizi
 
-🛠️ Kurulum ve Çalıştırma
-Projeyi bilgisayarınızda çalıştırmak için aşağıdaki adımları izleyin:
+2.Install Required Libraries:
 
-1. Projeyi İndirin:
+Pip install -r requirements.txt (If you do not have a requirements.txt file manually: pip install selenium matplotlib)
 
-git clone https://github.com/kullaniciadi/is-ilani-analizi.git
-cd is-ilani-analizi
+3.WebDriver Setting:
 
-2. Gerekli Kütüphaneleri Yükleyin:
+Download the chromedrive suitable for the version of Chrome on your computer and throw it in the project folder.
 
-pip install -r requirements.txt
-(Eğer requirements.txt dosyanız yoksa manuel olarak: pip install selenium matplotlib)
+4.Run:
 
-3. WebDriver Ayarı:
+Python main.py 📂 Project Architecture (Modules) The project is divided into 3 main modules according to the Separation of Concerns principle:
 
-Bilgisayarınızdaki Chrome sürümüne uygun chromedriverı indirin ve proje klasörüne atın.
-
-4. Çalıştırın:
-
-python main.py
-📂 Proje Mimarisi (Modüller)
-Proje, Sorumlulukların Ayrılığı (Separation of Concerns) ilkesine göre 3 ana modüle bölünmüştür:
-
+Plaintext ├── scraper.py # [Module 1] The bot that pulls raw data from the web (Data Collection). ├── database.py # [Module 2] Data cleaning, deduplication and SQLite operations. ├── main.py # [Module 3] Analysis logic, visualization and main stream. ├── is_ilanlari.db # [Out] Database where data is stored permanently. └── README.md # Project documentation. 📊 Case Scenario When the program runs, a flow similar to this occurs on the console:
 Plaintext
-├── scraper.py       # [Modül 1] Web'den ham veriyi çeken bot (Veri Toplama).
-├── database.py      # [Modül 2] Veri temizliği, deduplication ve SQLite işlemleri.
-├── main.py          # [Modül 3] Analiz mantığı, görselleştirme ve ana akış.
-├── is_ilanlari.db   # [Çıktı] Verilerin kalıcı saklandığı veritabanı.
-└── README.md        # Proje dokümantasyonu.
-📊 Örnek Senaryo
-Program çalıştığında konsolda şuna benzer bir akış gerçekleşir:
 
-Plaintext
-> Bot başlatılıyor...
-> [SCRAPER] 50 adet ilan başarıyla çekildi.
-> [DATABASE] Temizlik yapılıyor...
-> [DATABASE] Rapor: 15 yeni ilan veritabanına eklendi. (35 ilan zaten mevcuttu, atlandı.)
-> [ANALİZ] Veriler işleniyor...
-> [SONUÇ] En çok aranan yetenek: Python (28 İlan)
+The bot is starting... 
+[SCRAPER] 50 ads were successfully withdrawn.
+[DATABASE] Cleaning is being done... 
+[DATABASE] Report: 15 new ads added to the database. (35 ads already existed, skipped.) 
+[ANALYSIS] Processing data... 
+[RESULT] Top searched skill: Python (28 Ads)
