@@ -1,72 +1,65 @@
 
 import scrapy
-# Scrapy, veri yapısını ayrı bir dosyada istediği için
-# 'items.py' dosyasında tanımladığım Item sınıfını içe aktarıyorum.
+# Scrapy wants the data in a separate file
+# # We import the Item class that I defined in the 'items.py' file.
 from items import JobAdItem 
 
 START_URL = 'https://www.kariyer.net/is-ilanlari'
 
 class KariyerSpider(scrapy.Spider):
-    # Bu botumun adı. Botu çalıştırmak için bu adı kullanacağım.
+    # This is the name of our bot. I'll use this name to run the bot.
     name = 'my_first_kariyer_scraper'
-    
-    # Scrapy'nin çalışmaya başlaması gereken URL'lerin listesi. Tek bir başlangıç URL'i yeterli.
+    # List of URLs that Scrapy should start from. A single starting URL is sufficient.
     start_urls = [START_URL]
-    
-    #  2. Ana Fonksiyon: Bir Sayfa Yüklendiğinde Ne Yapılacak? 
-    # Bu 'parse' metodu, Scrapy başarılı bir şekilde bir sayfayı indirdiğinde çağrılır.
-    # 'response' objesi, sayfanın tüm HTML içeriğini içerir.
+    # Main Function 2: What to Do When a Page Loads?
+    # This 'parse' method is called when Scrapy successfully downloads a page.
+    # The 'response' object contains the entire HTML content of the page. 
+   
     def parse(self, response):
         
-        # Öncelikle, sayfadaki tüm iş ilanlarının nerede olduğunu bota söylemeliyim.
-        # İlan detaylarını tutan tüm ana konteynerleri (div'leri) bulmak için CSS Seçici kullanıyorum.
-        # NOT: Bu seçicinin Kariyer.net'in güncel tasarımına göre doğru olduğundan emin olmalıyız!
+       # First, I need to tell the bot where all the job postings on the page are located.
+       # I'm using a CSS Selector to find all the main containers (divs) that hold the posting details.
+       # NOTE: We need to make sure this selector is correct for Kariyer.net's current design!
         JOB_CARD_SELECTOR = 'div.list-items > div' 
         
-        # Şimdi, sayfada bulduğum her bir iş ilanı elementi üzerinde tek tek döngü kuruyorum.
         for job_card in response.css(JOB_CARD_SELECTOR):
             
             # Her bir ilan için, verilerini depolamak üzere yeni bir 'JobAdItem' oluşturuyorum.
             item = JobAdItem()
+            # Now I loop over each job posting element I find on the page, one by one.
+            # Data Extraction Section
+            # 1. Finding the Job Title and Link
+            # The title and link are usually found together within an <a> tag.
             
-            #  Veri Çekme Bölümü 
-            
-            # 1. İş Başlığını ve Linki Bulma
-            # Başlık ve link genellikle bir <a> etiketi içinde birlikte bulunur.
             title_element = job_card.css('div.job-card-head > a')
-            
-            # <a> etiketinin içindeki metni başlık olarak alıyorum. (default='' ile hata yönetimini kolaylaştırıyorum)
+            # I take the text inside the <a> tag as the title. (I make error handling easier with default=""
             item['job_title'] = title_element.css('::text').get(default='').strip()
-            
-            # Benzersiz linki almak için 'href' özniteliğini çekiyorum.
+            # I am pulling the 'href' attribute to get the unique link.
             link = title_element.attrib.get('href', '')
             item['ad_link'] = response.urljoin(link) # response.urljoin, linki tam (mutlak) URL yapar.
+            # 2. Finding the Company Name
+            # The company name is usually in a paragraph (<p>) tag near the title.
             
-            # 2. Şirket Adını Bulma
-            # Şirket adı genellikle başlığa yakın bir paragraf (<p>) etiketi içindedir.
             company_text = job_card.css('div.job-card-head > p::text').get(default='')
             item['company_name'] = company_text.strip()
+            # 3. Finding the Summary Description
+            # I'm capturing the short description text that appears on the ad card.
             
-            # 3. Özet Açıklamayı Bulma
-            # İlan kartında görünen kısa açıklama metnini çekiyorum.
             description_text = job_card.css('div.job-card-body > div.job-card-desc::text').get(default='')
             item['summary_description'] = description_text.strip()
+            # I 'yield' the collected Item. This sends the clean data to Scrapy's
+            # output pipeline (which is the data the second person will receive).
             
-            # Verisi toplanan Item'ı 'yield' ediyorum. Bu, temiz veriyi Scrapy'nin 
-            # çıktı boru hattına gönderir (bu da 2. kişinin alacağı veridir).
             yield item
-            
-        #  3. Sayfalandırma (Pagination) Mantığı: Bir Sonraki Sayfayı Bulma 
-        
-        # Tüm ilanları işledikten sonra, bir sonraki sayfanın linkini bulmalıyım.
-        # 'Sonraki' butonunu/linkini bulmak için CSS Seçici kullanıyorum.
+            # 3. Pagination Logic: Finding the Next Page
+            # After processing all the ads, I need to find the link to the next page.
+            # I'm using CSS Selector to find the 'Next' button/link.
         NEXT_PAGE_SELECTOR = 'div.pagination a.next::attr(href)' 
-        
         next_page_url = response.css(NEXT_PAGE_SELECTOR).get()
-        
-        # Eğer link gerçekten varsa, bu demektir ki son sayfaya ulaşmadık!
+                # If the link actually exists, it means we haven't reached the last page!
+
         if next_page_url is not None:
-            # Scrapy'ye bu yeni URL'i ziyaret etmesini söylüyorum.
-            # Ayrıca yeni sayfa için de yine bu 'parse' metodunu çağırmasını istiyorum.
-            # Bu, botu son linki bulana kadar otomatik olarak devam ettirir.
+            # I'm telling Scrapy to visit this new URL.
+            # I'm also asking it to call this 'parse' method for the new page.
+            # This will automatically continue the bot until it finds the last link.
             yield response.follow(next_page_url, callback=self.parse)

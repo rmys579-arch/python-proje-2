@@ -1,19 +1,16 @@
-# bu dosya ile çekeceiğimiz verinin yapısını tanımlıyoruz.
-# site kariyer.net olacak aranan pyhton developer için ilan başlığı, şirket adı, kısa açıklama ve ilan linki bilgilerini çekeceğiz.
-import scrapy #web sitesinden istenilen veriyi çekebilmek için bu kütüphaneyi içeri aktarıyoruz.
+# With this file we define the structure of the data we will retrieve.
+# The site will be kariyer.net and we will get the job title, company name, short description and job link information for the sought-after Python developer.
+import scrapy #We import this library to retrieve the desired data from the #website.
 
 class JobAdItem(scrapy.Item):
     """
-    Bu, benim Item tanımım. Çektiğim veriyi bir sonraki kişiye (Veri Mimarı) 
-    teslim etmek için kullandığım veri yapısıdır. Yapılandırılmış bir Python 
-    sözlüğü (dictionary) gibidir.
+    This is my Item definition. It's the data structure I use to deliver the data I've extracted to the next person (the Data Architect). It's like a structured Python dictionary.
     """
-    job_title = scrapy.Field()          # İş ilanının başlığını tutacak.
-    company_name = scrapy.Field()       # İlanı yayınlayan şirketin adını tutacak.
-    summary_description = scrapy.Field()# İş açıklamasının kısa özetini tutacak.
-    ad_link = scrapy.Field()            # Tekrarlayan ilanları kontrol etmek için link.#  1. Proje Kurulum Değişkenleri 
-# Arama anahtar kelimesini buraya ayarlıyorum. Başlangıç için Python Developer seçtik.
+    job_title = scrapy.Field()          # Will hold the title of the job posting.
+    company_name = scrapy.Field()       # Will keep the name of the company that published the ad.
+    summary_description = scrapy.Field()# Will keep a brief summary of the job description.
+    ad_link = scrapy.Field()            # Link to check for duplicate postings.# 1. Project Setup Variables
 SEARCH_KEYWORD = "Python-Developer" 
-
-# Kariyer.net için başlangıç URL'ini oluşturuyorum. Bot, işe bu sayfadan başlayacak.
+# I'm setting the search keyword here. We chose Python Developer to start.
+# I'm creating the starting URL for Kariyer.net. The bot will start from this page.
 START_URL = f"https://www.kariyer.net/is-ilanlari/{SEARCH_KEYWORD}-is-ilanlari"
