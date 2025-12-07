@@ -1,15 +1,22 @@
 import matplotlib.pyplot as plt
-from database import MongoDBManager, HTMLCleaner, EmojiCleaner, StopwordCleaner
+from database import MongoDBManager, HTMLCleaner, EmojiCleaner, StopwordCleaner, IDatabase
 import re
 import logging
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
+
 class MongoDBManagerWithCleaning(MongoDBManager):
     """Extends MongoDBManager to include data cleaning before saving."""
 
-    def __init__(self, uri="mongodb://localhost:27017", db="jobs", collection="ads"):
+    def __init__(self, uri=None, db=None, collection=None):
         super().__init__(uri, db, collection)
         self.html_cleaner = HTMLCleaner()
         self.emoji_cleaner = EmojiCleaner()
@@ -61,7 +68,7 @@ def print_postings(postings: list[dict], title: str = "Job Postings"):
     print(f"{'='*80}\n")
     
     for i, posting in enumerate(postings, 1):
-        print(f"📋 Posting #{i}")
+        print(f" Posting #{i}")
         print(f"   Job Title: {posting.get('job_title', 'N/A')}")
         print(f"   Company: {posting.get('company_name', 'N/A')}")
         print(f"   Description: {posting.get('summary_description', 'N/A')[:100]}...")
@@ -72,13 +79,54 @@ def print_postings(postings: list[dict], title: str = "Job Postings"):
 def main():
     """Main entry point for the application."""
     logging.info("Starting Job Scraper Application...")
+    logging.info(f"MongoDB Config - URI: {MONGODB_URI}, DB: {MONGODB_DB}, Collection: {MONGODB_COLLECTION}")
     
-    # Initialize the database manager with cleaning
-    db_manager = MongoDBManagerWithCleaning(
-        uri="mongodb://localhost:27017",
-        db="jobs",
-        collection="ads"
-    )
+    # Initialize the database manager with cleaning (try MongoDB, fallback to in-memory)
+    try:
+        db_manager = MongoDBManagerWithCleaning()
+    except Exception as e:
+        logging.warning(f"MongoDB unavailable, using in-memory DB fallback: {e}")
+
+        class InMemoryDBManager:
+            """Simple in-memory DB replacement used when MongoDB is unreachable."""
+
+            def __init__(self):
+                self.html_cleaner = HTMLCleaner()
+                self.emoji_cleaner = EmojiCleaner()
+                self.stopword_cleaner = StopwordCleaner()
+                self._store: list[dict] = []
+
+            def clean_posting(self, posting: dict) -> dict:
+                p = posting.copy()
+                p['job_title'] = self.stopword_cleaner.clean(
+                    self.emoji_cleaner.clean(
+                        self.html_cleaner.clean(p.get('job_title', ''))
+                    )
+                )
+                p['company_name'] = self.stopword_cleaner.clean(
+                    self.emoji_cleaner.clean(
+                        self.html_cleaner.clean(p.get('company_name', ''))
+                    )
+                )
+                p['summary_description'] = self.stopword_cleaner.clean(
+                    self.emoji_cleaner.clean(
+                        self.html_cleaner.clean(p.get('summary_description', ''))
+                    )
+                )
+                return p
+
+            def save_postings(self, postings: list[dict]):
+                cleaned = [self.clean_posting(p) for p in postings]
+                existing = {p.get('ad_link') for p in self._store}
+                new = [p for p in cleaned if p.get('ad_link') not in existing]
+                self._store.extend(new)
+                logging.info(f"(InMemory) Inserted {len(new)} postings.")
+                return new
+
+            def find_all_postings(self):
+                return list(self._store)
+
+        db_manager = InMemoryDBManager()
     
     # Sample job postings for demonstration
     sample_postings = [
@@ -128,7 +176,25 @@ def main():
             logging.warning("No postings found in database.")
     except Exception as e:
         logging.error(f"Error retrieving postings: {e}")
+        postings = []
     
+    logging.info("Job Scraper Application finished.")
+    
+    # A simple counting logic to plot the graph
+    if not postings:
+        postings = []
+    
+    all_text = " ".join([p.get('summary_description', '') + " " + p.get('job_title', '') for p in postings])
+    
+    # Sample skill set
+    # If data exists, draw the graph
+    target_skills = ["Python", "Java", "React", "Node.js", "Spring"]
+    skill_counts = {skill: all_text.count(skill) for skill in target_skills}
+    
+    if any(skill_counts.values()):
+        logging.info("Grafik oluşturuluyor...")
+        plot_skill_distribution(skill_counts)
+
     logging.info("Job Scraper Application finished.")
 
 
