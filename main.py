@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from database import MongoDBManager, HTMLCleaner, EmojiCleaner, StopwordCleaner, IDatabase
+from database import MongoDBManager, HTMLCleaner, EmojiCleaner, StopwordCleaner, IDatabase, MONGODB_URI, MONGODB_DB, MONGODB_COLLECTION
 import re
 import logging
 import os
