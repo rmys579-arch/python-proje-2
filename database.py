@@ -4,6 +4,18 @@ from pymongo import MongoClient, errors
 import re
 import logging
 import time
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# -------------------------------------------------------
+# CONFIGURATION
+# -------------------------------------------------------
+MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+MONGODB_DB = os.getenv("MONGODB_DB", "jobs")
+MONGODB_COLLECTION = os.getenv("MONGODB_COLLECTION", "ads")
 
 # -------------------------------------------------------
 # LOGGING SETUP
@@ -76,10 +88,13 @@ class StopwordCleaner(BaseCleaner):
 class MongoDBManager(IDatabase):
     """Handles all DB logic with robustness."""
 
-    def __init__(self, uri="mongodb://localhost:27017", db="jobs", collection="ads"):
-        self.uri = uri
-        self.db_name = db
-        self.collection_name = collection
+    def __init__(self, uri=None, db=None, collection=None):
+        # Use environment variables if parameters are not provided
+        self.uri = uri or MONGODB_URI
+        self.db_name = db or MONGODB_DB
+        self.collection_name = collection or MONGODB_COLLECTION
+        
+        logging.info(f"Connecting to MongoDB: {self.uri}/{self.db_name}/{self.collection_name}")
 
         # cleaners
         self.html_cleaner = HTMLCleaner()
