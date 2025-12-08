@@ -4,18 +4,6 @@ from pymongo import MongoClient, errors
 import re
 import logging
 import time
-import os
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
-
-# -------------------------------------------------------
-# CONFIGURATION
-# -------------------------------------------------------
-MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
-MONGODB_DB = os.getenv("MONGODB_DB", "jobs")
-MONGODB_COLLECTION = os.getenv("MONGODB_COLLECTION", "ads")
 
 # -------------------------------------------------------
 # LOGGING SETUP
